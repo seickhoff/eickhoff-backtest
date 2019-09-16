@@ -1,0 +1,37 @@
+<html>
+
+	<body>
+		<a href="backtest.txt" target="_blank" "="">Backtest Syntax Help</a>
+		<br>
+		<br>
+
+		<form method="post" action="backtest.php" target="_blank">
+
+<textarea name="backtest" cols="200" rows="40" wrap="physical">SYMBOL PYPL,AAPL
+SYMBOL AAPL, PYPL, GOOG
+ACCOUNT 5000
+COMMISSION 4.50
+START_DATE 20190101
+END_DATE 20190805
+PIN 2828
+DISPLAY DATE, OPEN, CLOSE, HIGH, LOW, VOLUME
+
+MFI (mf1, 14)
+
+# Use RSI and Candles
+RSI    (rsi14, 14, 0)
+CANDLE (color, trend, patterns) 
+
+# Buy if RSI is less than or equal to 35 and the Candle Pattern is Bullish Reversal
+BUYIF ( match('/R+/', patterns[0]) && rsi14[0] <= 35 ) THEN "Buy issued"
+
+# Sell if RSI is equal to or greater than 70 and the Candle Pattern is Bearish Reversal/Continuation
+SELLIF ( match('/R|C-/', patterns[0]) && rsi14[0] >= 70 ) THEN "Sell issued"
+</textarea>
+			<br>
+			<br>
+			<input type="submit" value="Submit">
+		</form>
+
+	</body>
+</html>

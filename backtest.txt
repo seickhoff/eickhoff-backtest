@@ -1,0 +1,230 @@
+############ DEFINE GENERAL PARAMETERS
+
+# Declare the stock symbol or symbols (csv list)
+SYMBOL C,EBAY
+
+# Start date of backtest
+START_DATE 20190101
+
+# End date date of backtest
+END_DATE 20190906
+
+# General column headers. Choices: SYMBOL,DATE,OPEN,CLOSE,LOW,HIGH,VOLUME
+DISPLAY DATE,OPEN,CLOSE,LOW,HIGH,VOLUME
+
+# Include this keyword to limit reporting (SUMMARY skip any days with no activity; BRIEF just list the Buy and Sells)
+SUMMARY
+
+# Declare the brokerage commission per trade
+COMMISSION 4.50
+
+# Declare the starting account balance
+ACCOUNT 5000
+
+
+############ DEFINE YOUR TECHNICAL INDICATORS AND FORMULAS (the labels will appear as column headers)
+
+#SMA(vol10,10,VOLUME,0)
+#PRICECHANNEL(PC10_high,PC10_low,10,HIGH,LOW,2)
+
+
+####### Using two SMA's crossing (Buy if 5 day sma crosses above 10 day sma. Sell if 5 day sma crosses below 10 day sma))
+#SMA(sma5,5,2)
+#SMA(sma10,10,2)
+#BUYIF ( (sma5[0] - sma10[0] > 0) && (sma5[-1] - sma10[-1]) < 0 ) THEN "buy"
+#SELLIF ( (sma5[0] - sma10[0] < 0) && (sma5[-1] - sma10[-1]) > 0 ) THEN "sell"
+
+
+####### Using RSI in a range (Buy if 14 day RSI crosses above 50 (from below. Sell if 14 day RSI crosses below 70 (from above); or drops below 50)
+#RSI(rsi14,14,0)
+#BUYIF ( rsi14[0] > 50  && rsi14[-1] < 50  && rsi14[-1] != 0 ) THEN "buy"
+#SELLIF ( (rsi14[0] < 70  && rsi14[-1] >= 70 ) || rsi14[0] < 50) THEN "sell"
+
+
+####### Using ADX and MACD Histogram
+#ADX(adx10,di_plus10,di_minus10,10,0)
+#MACD(macd12_26,signal9,histogram,12,26,9,2) 
+#BUYIF (adx10[0] > 20 && histogram[0] > 0 && histogram[-1] <= 0) THEN "buy"
+#SELLIF ( !(adx10[0] > adx10[-1]) && histogram[0] < (histogram[-1]) * 0.80) THEN "sell"
+
+
+####### using RSI with ADX (try with 'C'; +98%)
+#ADX(adx10,di_plus10,di_minus10,10,0)
+#RSI(rsi5,5,0)
+#BUYIF (di_minus10[0] / rsi5[0] > 10) THEN "buy"
+#SELLIF ( (rsi5[0] >= 65 && (rsi5[0] / di_minus10[0]) > 9) || ((histogram[-1] - histogram[0]) > 0.04 && !(di_minus10[0] / rsi5[0] > 10)) ) THEN "sell"
+
+
+####### Candles with RSI
+#CANDLE(color,trend,patterns) 
+#RSI(rsi5,5,0)
+#BUYIF (match('/R+/', patterns[0]) && rsi5[0] <= 35 && CLOSE[0] <= 50) THEN "buy"
+#SELLIF (match('/{R|C}-/', patterns[0]) && rsi5[0] >= 70) THEN "sell"
+
+
+####### ADX with EMA
+ADX(adx10,di_plus10,di_minus10,10,0)
+EMA(ema10,10,CLOSE,2)
+BUYIF (di_plus10[0] > di_minus10[0] && ema10[0] > CLOSE[0]) THEN "buy"
+SELLIF (di_minus10[0] > di_plus10[0]) THEN "sell"
+
+
+
+####################################
+#
+# Reference for Defining Formulas:
+#
+# 1. For buying, start the line with BUYIF followed by a formula, followed by THEN, followed by a label in double quotes:
+#       BUYIF (formula) THEN "label"
+#
+# 2. For selling, start the line with SELLIF followed by a formula, followed by THEN, followed by a label in double quotes:
+#       SELLIF (formula) THEN "label"
+#
+# 3. There can be only one active BUYIF and one active SELLIF line per run.  Comment out any other lines by placing # at the start of the line.
+#
+# 4. Enclose formalas in parenthesis; OK to nest parenthesis
+#
+# 5. Follow each label with brackets to indicate the day: 
+#               label[0] is current trading day
+#               label[-1] is one trading day back
+#               label[-n] is n trading days back (replace n with any negative number)
+#
+# 6. Operators: == (equals)
+#               <= (less than or equal to)
+#               >= (greater than or equal to)
+#               >  (greater than)
+#               <  (less than)
+#               match('/regex/', label[0])  (RegEx pattern matching where /regex/ is a valid regular expression pattern; use for matching Candle Patterns and Dates)
+#                   
+#               Note: Use braces to group a logical OR in a regex pattern. Example: match "R-" or "C-": '/{R|C}-/'
+#
+# 7. Constants: besides the Techinical Indicators you define, the following contants are available in formulas using these labels
+#               DATE[n]
+#               OPEN[n]
+#               LOW[n]
+#               HIGH[n]
+#               VOLUME[n]
+#
+####################################
+
+
+####################################
+#
+# Reference for Defining Techinicals:
+#
+# 1. Simple Moving Average: 
+#
+#    SMA(label,days,column,precision)   
+# 
+#    label: provide a unique label to the SMA being defined for use in a backtest formula.
+#    days: enter an integer for the amount of days in the SMA calculation.
+#    column: select from one of these keywords: CLOSE, OPEN, VOLUME, HIGH, LOW.
+#    precision: provide the number of decimal places for data output.
+#
+# 2. Exponential Moving Average: 
+#
+#    EMA(label,days,column,precision)   
+# 
+#    label: provide a unique label to the EMA being defined for use in a backtest formula.
+#    days: enter an integer for the amount of days in the EMA calculation.
+#    column: select from one of these keywords: CLOSE, OPEN, VOLUME, HIGH, LOW.
+#    precision: provide the number of decimal places for data output.
+#
+# 3. Relative Strength Index: 
+#
+#    RSI(label,days,precision) 
+#
+#    label: provide a unique label to the RSI being defined for use in a backtest formula.
+#    days: enter an integer for the amount of days in the RSI calculation.
+#    precision: provide the number of decimal places for data output.
+#
+# 4. Average Directional Index: 
+#
+#    ADX(adx_label,di_plus_label,di_minus_label,days,precision) 
+#
+#    adx_label: provide a unique label to the ADX being defined for use in a backtest formula.
+#    di_plus_label: provide a unique label to the +DI being defined for use in a backtest formula..
+#    di_minus_label: provide a unique label to the -DI being defined for use in a backtest formula.
+#    days: enter an integer for the amount of days in the ADX calculation.
+#    precision: provide the number of decimal places for data output.
+#
+# 5. Moving Average Convergence / Divergence: 
+#
+#    MACD(macd_label,signal_label,divergence_label,macd_fast_days,macd_slow_days,signal_days,precision) 
+#
+#    macd_label: provide a unique label to the MACD (fast EMA - slow EMA) for use in a backtest formula.
+#    signal_label: provide a unique label to the Signal (EMA of MACD ) for use in a backtest formula.
+#    divergence_label: provide a unique label to the Histogram (MACD - Signal) for use in a backtest formula.
+#    macd_fast_days: enter an integer for the amount of days in the fast EMA calculation..
+#    macd_slow_days: enter an integer for the amount of days in the slow EMA calculation.
+#    signal_days: enter an integer for the amount of days in the smoothing EMA calculation.
+#    precision: provide the number of decimal places for data output.
+#
+# 6. Bollinger Bands
+#
+#    BOLLINGER(bol_middle_label,bol_upper_label,bol_lower_label,period,deviations,precision)
+#
+#    bol_middle_label: label for the middle band.
+#    bol_upper_label: label for the upper band.
+#    bol_lower_label: label for the lower band.
+#    period: enter the amount of days.
+#    deviations: standard deviation multiplier; typically 2.
+#    precision: provide the number of decimal places for data output.
+#
+# 7. Price Channel
+#
+#    PRICECHANNEL(label_pc_high,label_pc_low,pc_days,high,low,precision)
+#
+#    label_pc_high: label for the high price channel value.
+#    label_pc_low: label for the low price channel value.
+#    pc_days: amount of days to track price channel.
+#    high: use the keyword HIGH.
+#    low: use the keyword LOW.
+#    precision: provide the number of decimal places for data output.
+#
+# 8. Money Flow Index
+#
+#    MFI(label_mfi,mfi_days)
+#
+#    label_mfi: label for the mfi value.
+#    mfi_days: amount of days to track mfi.
+#
+# 9. Candlestick Patterns
+#
+#    CANDLE(color_label,trend_pct_label,patterns_label) 
+#
+#    color: label for the color values returned: Black and White.
+#    patterns: label for the candlestick patterns that are returned, possibilites are described in detail below.
+##
+#    General patterns:
+#      Long, Short, Doji
+#      Marubozu, Opening Marubozu, Closing Marubozu, Spinning Top
+#
+#    Bullish Reversal patterns (R+):
+#      Hammer R+, Belt Hold R+, Engulging R+, Harami R+, Harami Cross R+, Inverted Hammer R+,
+#      Piercing Line R+, Doji Star R+, Meeting Lines R+, Homing Pigeon R+, Matching Low R+,
+#      Kicking R+, One White Soldier R+, Morning Star R+, Morning Doji Star R+, Abandoned Baby R+,
+#      Tri Star R+, Downside Gap Two Rabbits R+, Unique Three River Bottom R+, Three White Soldiers R+,
+#      Descent Block R+, Deliberation R+, Two Rabbits R+, Three Inside Up R+, Three Outside Up R+, 
+#      Three Stars in the South R+
+#
+#    Bullish Continuation patterns (C+):
+#      Separating Lines C+, On Neck Line C+, In Neck Line C+, Thrusting C+, Upside Tasuki Gap C+,
+#      Side by Side White Lines C+, Upside Gap 3 Methods C+, Rest After Battle C+, Rising 3 Methods C+,
+#      Mat Hold C+, 3 Line Strike C+
+#
+#    Bearish Reversal patterns (R-):
+#      Hanging Man R-, Belt Hold R-, Engulging R-, Harami R-, Harami Cross R-, Shooting Star R-,
+#      Dark Cloud Cover R-, Doji Star R-, Meeting Lines R-, Decending Hawk R-, Matching High R-, 
+#      Kicking R-, One Black Crow R-, Evening Star R-, Evening Doji Star R-, Abandoned Baby R-,
+#      Tri Star R-, Upside Gap Two Crows R-, Unique Three Mountain Top R-, Identical Three Crows R-,
+#      Three Black Crows R-, Deliberation R-, Two Crows R-, Three Inside Down R-, Three Upside Down R-,
+#      Three Stars in the North R-
+#
+#    Bearish Continuation patterns (C-):
+#      Separating Lines C-, On Neck Line C-, In Neck Line C-, Thrusting C-, Downside Tasuki Gap C-,
+#      Side by Side Black Lines C-, Downside Gap 3 Methods C-, Falling 3 Methods C-, Mat Hold C-,
+#      3 Line Strike C-
+#
+######################################
+
