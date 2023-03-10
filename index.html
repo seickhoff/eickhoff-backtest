@@ -1,19 +1,17 @@
 <html>
-
 	<body>
 		<a href="backtest.txt" target="_blank" "="">Backtest Syntax Help</a>
 		<br>
 		<br>
-
 		<form method="post" action="backtest.php" target="_blank">
 
-<textarea name="backtest" cols="200" rows="40" wrap="physical">SYMBOL PYPL,AAPL
-SYMBOL AAPL, PYPL, GOOG
+<textarea name="backtest" cols="200" rows="20" wrap="physical">
+SYMBOL CAT
 ACCOUNT 5000
 COMMISSION 4.50
-START_DATE 20190101
-END_DATE 20190805
-PIN 2828
+START_DATE 20210101
+END_DATE 20230310
+PIN 
 DISPLAY DATE, OPEN, CLOSE, HIGH, LOW, VOLUME
 
 MFI (mf1, 14)
@@ -32,6 +30,5 @@ SELLIF ( match('/R|C-/', patterns[0]) && rsi14[0] >= 70 ) THEN "Sell issued"
 			<br>
 			<input type="submit" value="Submit">
 		</form>
-
 	</body>
 </html>
