@@ -1,8 +1,20 @@
 # eickhoff-backtest
 
-Write and execute backtests using formulas to trigger buying and selling stocks.  For the simulation,  
+Write and execute backtests using formulas to trigger buying and selling stocks.  When a Buy is triggered, the stock is bought the next day at the average price of that day. When a Sell is triggered, the stock is sold the next day at the average price of that day.  
 
-### Declare the stock symbol or symbols (csv list)
+Configuration:
+
+![image](https://user-images.githubusercontent.com/2509012/224196645-370e5546-3c5e-4da5-b1ad-112d7c5ba767.png)
+
+Results:
+
+![image](https://user-images.githubusercontent.com/2509012/224196233-17d20ca5-9419-489f-9ec3-4ec08e36c7f0.png)
+
+## Configuration
+
+### Declare the stock symbol or symbols
+
+Enter a CSV list.
 
 - `SYMBOL C,EBAY`
 
@@ -31,6 +43,10 @@ Choices: SYMBOL, DATE, OPEN, CLOSE, LOW, HIGH, VOLUME
 ### Declare the starting account balance
 
 - `ACCOUNT 5000`
+
+### Enter a PIN for Authorization
+
+- `PIN xxxxxxxxxxxxxxxxx`
 
 ## Technical indicators
 
